@@ -3,6 +3,18 @@
 Deterministic, event-driven freight and service-charge settlement. No LLMs in any financial math.
 Everything free / open source, no Docker.
 
+## Screenshots
+The dashboard has a light and a dark theme (toggle at the top right; it remembers your choice, and `?theme=dark` forces one).
+Every change to the evidence recalculates live as a preview; nothing is saved until you press **Submit for settlement**.
+
+**Light theme**
+
+![Vectura Reconcile dashboard, light theme](docs/images/dashboard-light.png)
+
+**Dark theme**
+
+![Vectura Reconcile dashboard, dark theme](docs/images/dashboard-dark.png)
+
 ## Stack
 FastAPI + Uvicorn · Pydantic v2 / pydantic-settings · SQLAlchemy 2 + Alembic ·
 SQLite (default) or PostgreSQL (free, native install) · ReportLab (PDF) · httpx (EIA API) · pytest + ruff + GitHub Actions.
@@ -23,6 +35,7 @@ copy .env.example .env        # edit
 powershell -ExecutionPolicy Bypass -File scripts/run.ps1    # migrate + seed + serve on http://localhost:8000 (single process: Windows cannot share the port across workers). Linux: sh scripts/run.sh (4 workers)
 ```
 Open http://localhost:8000/ . Docs at `/docs`. Health: `/healthz`, `/readyz`.
+The dashboard loads its data from the running service, so open it through that address (not by double-clicking `index.html`). If the service is down it shows an "Offline" banner and retries automatically.
 Real fuel prices: set `VECTURA_EIA_API_KEY` (free at eia.gov/opendata) and run `python -m vectura.eia_fuel_index` weekly (Task Scheduler / cron).
 PostgreSQL: set `VECTURA_DATABASE_URL=postgresql+psycopg://user:pw@localhost:5432/vectura`.
 
