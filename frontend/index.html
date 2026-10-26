@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vectura Reconcile</title>
+<style>
+:root{
+  --bg:#f5f6f8;--panel:#fff;--line:#dfe3e8;--line2:#eceff3;--ink:#1c2430;--muted:#627084;--faint:#98a2b3;
+  --accent:#1d4ed8;--accent-d:#1a41b3;
+  --ok:#146c43;--ok-bg:#e6f4ec;--warn:#8a5300;--warn-bg:#fcf1d9;--bad:#a11a1a;--bad-bg:#fbe9e7;--info:#3b3fa8;--info-bg:#ebecfa;--neu:#475467;--neu-bg:#eef0f3;
+}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{display:flex;gap:10px;align-items:center;padding:18px 18px 16px;border-bottom:1px solid var(--line2)}
+.mark{width:30px;height:30px;border-radius:6px;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:700;font-size:15px}
+.brand b{display:block;font-size:14px;line-height:1.15}.brand small{color:var(--muted);font-size:12px}
+nav{padding:10px 10px;display:grid;gap:2px}
+nav button{text-align:left;background:none;border:0;border-radius:6px;padding:8px 10px;color:var(--muted);cursor:pointer;font-weight:500}
+nav button:hover{background:var(--bg);color:var(--ink)}
+nav button.on{background:var(--neu-bg);color:var(--ink);font-weight:600}
+.sidefoot{margin-top:auto;padding:14px 18px;border-top:1px solid var(--line2);font-size:12px;color:var(--muted);display:grid;gap:6px}
+.sidefoot .row{display:flex;align-items:center;gap:8px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint)}.dot.up{background:#22a06b}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;text-align:left;font-size:12px}
+.content{padding:24px 32px 60px;max-width:1280px;width:100%}
+.top{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
+h1{font-size:20px;font-weight:600;letter-spacing:-.01em}.top .sub{color:var(--muted)}
+.view{display:none}.view.on{display:block}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.panel>.ph{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line2)}
+.panel>.ph h2{font-size:14px;font-weight:600}.panel>.pb{padding:16px}
+.hint{color:var(--muted);font-size:12px}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:340px 1fr}
+
+.btn{border:1px solid var(--line);background:#fff;border-radius:6px;padding:7px 12px;cursor:pointer;font-weight:500}
+.btn:hover{background:var(--bg)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:var(--accent-d)}
+.btn.sm{padding:3px 9px;font-size:12px}
+input,select,textarea{border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:#fff;width:100%;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(29,78,216,.15)}
+label.f{display:block;font-size:12px;color:var(--muted);margin-bottom:10px}label.f>span{display:block;margin-bottom:3px}
+
+/* summary strip */
+.strip{display:grid;grid-template-columns:repeat(5,1fr);margin-bottom:16px}
+.strip>div{padding:14px 18px;border-right:1px solid var(--line2)}.strip>div:last-child{border-right:0}
+.strip small{display:block;color:var(--muted);font-size:12px}
+.strip b{display:block;font-size:22px;font-weight:600;font-variant-numeric:tabular-nums;margin-top:2px}
+.strip .sub{font-size:12px;color:var(--muted)}
+.c-ok{color:var(--ok)}.c-warn{color:var(--warn)}
+
+/* mode tabs + scenario list */
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 12px;color:var(--muted);cursor:pointer;font-weight:500;margin-bottom:-1px;text-align:left;line-height:1.2}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.scn{display:grid;grid-template-columns:26px 1fr;gap:10px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line2);padding:11px 16px;cursor:pointer}
+.scn:hover{background:var(--bg)}.scn.on{background:#eef3ff}
+.scn .let{font:600 12px/22px ui-monospace,Consolas,monospace;background:var(--neu-bg);color:var(--neu);border-radius:4px;text-align:center;height:22px}
+.scn.on .let{background:var(--accent);color:#fff}
+.scn b{display:block;font-weight:600}.scn span{display:block;color:var(--muted);font-size:12.5px}
+
+/* studio */
+#tl{width:100%;height:auto;display:block;touch-action:none;user-select:none}
+.pin{cursor:grab}.pin:active{cursor:grabbing}
+.tray{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:6px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.daystrip{display:flex;gap:6px;flex-wrap:wrap}
+.day{width:88px;padding:8px;border:1px solid var(--line);border-radius:6px;text-align:center;font-size:12px;background:#fff}
+.day b{display:block;font-size:16px;font-weight:600}.day small{color:var(--muted);display:block}
+.day.free{background:var(--bg);color:var(--muted)}.day.chg{cursor:pointer}.day.chg:hover{border-color:var(--accent)}
+.day.noslot{background:var(--warn-bg);border-color:#e6c26f}
+.claimrow{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--line2)}
+.money{position:relative;width:150px;margin:0}.money::before{content:"$";position:absolute;left:10px;top:25px;color:var(--muted)}.money input{padding-left:22px;font-weight:600}
+
+/* result */
+.state{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px}
+.state.pv{background:var(--warn-bg);color:var(--warn)}.state.sv{background:var(--ok-bg);color:var(--ok)}
+.chip{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;white-space:nowrap}
+.APPROVE,.ok{background:var(--ok-bg);color:var(--ok)}.PARTIAL_APPROVE,.warn{background:var(--warn-bg);color:var(--warn)}
+.REQUEST_MISSING_PROOF,.info{background:var(--info-bg);color:var(--info)}.HITL_REVIEW,.bad{background:var(--bad-bg);color:var(--bad)}
+.neu{background:var(--neu-bg);color:var(--neu)}
+.alert{padding:10px 14px;border:1px solid #efb7b0;background:var(--bad-bg);color:var(--bad);border-radius:6px;margin-bottom:10px;font-weight:600}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;font-weight:600;color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);background:#fafbfc;white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line2);vertical-align:top}
+.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.line{cursor:pointer}tr.line:hover td{background:#fafbfc}
+.minibar{display:block;height:4px;border-radius:2px;background:var(--line2);margin-top:5px;overflow:hidden}.minibar i{display:block;height:100%;background:#22a06b}
+tr.det td{background:#fafbfc}
+.det .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:24px}
+.det h4{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.det ul{padding-left:16px}.det li{margin:2px 0}
+.det .clause{margin-top:10px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--muted)}
+.det .own{margin-top:10px}
+.empty{color:var(--muted);padding:26px 10px;text-align:center}
+.acts{display:flex;gap:5px;flex-wrap:wrap}
+.log{display:grid;grid-template-columns:62px 1fr;gap:4px 12px;font-size:12.5px}
+.log .t{color:var(--faint);font-variant-numeric:tabular-nums}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.evrow{display:grid;grid-template-columns:1.3fr 1fr 1.2fr auto;gap:6px;margin-bottom:6px}
+.drop{border:1px dashed #b9c1cc;border-radius:6px;padding:18px;text-align:center;color:var(--muted)}.drop.over{border-color:var(--accent);background:#eef3ff}
+
+.scrim{position:fixed;inset:0;background:rgba(20,28,40,.45);display:none;place-items:center;padding:20px;z-index:50}.scrim.on{display:grid}
+.modal{background:#fff;border:1px solid var(--line);border-radius:8px;width:min(460px,100%);padding:22px;box-shadow:0 12px 32px rgba(16,24,40,.18)}
+.modal h3{font-size:16px;margin-bottom:4px}.modal p{color:var(--muted);margin-bottom:14px;font-size:13px}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;display:grid;gap:8px;z-index:70}
+.toast{background:var(--ink);color:#fff;padding:9px 16px;border-radius:6px;font-size:13px;box-shadow:0 6px 18px rgba(16,24,40,.25)}.toast.err{background:#a11a1a}
+@media(max-width:1100px){.app{grid-template-columns:1fr}aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center}nav{display:flex}.sidefoot{margin:0;border:0}.g2{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,1fr)}.det .cols{grid-template-columns:1fr}.content{padding:18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="brand"><div class="mark">V</div><div><b>Vectura Reconcile</b><small>Charge settlement</small></div></div>
+  <nav id="nav">
+    <button data-v="work" class="on">Settlements</button>
+    <button data-v="cases">Cases</button>
+    <button data-v="prev">Prevention</button>
+    <button data-v="ops">Operations</button>
+  </nav>
+  <div class="sidefoot">
+    <div class="row"><span class="dot" id="health"></span><span id="envtxt">Connecting…</span></div>
+    <button class="linkbtn" id="keybtn" hidden>API key</button>
+    <button class="linkbtn" id="resetbtn" hidden>Reset demo data</button>
+  </div>
+</aside>
+
+<div class="content">
+<div class="top"><h1 id="ptitle">Settlements</h1><span class="sub" id="psub">Check a carrier bill against the contract and recorded events.</span></div>
+
+<!-- ============ SETTLEMENTS ============ -->
+<section class="view on" id="v-work">
+  <div class="panel strip">
+    <div><small>Carrier claimed</small><b id="k1">—</b><span class="sub" id="k1s">&nbsp;</span></div>
+    <div><small>Supported by evidence</small><b id="k2" class="c-ok">—</b><span class="sub" id="k2s">&nbsp;</span></div>
+    <div><small>Variance</small><b id="k3" class="c-warn">—</b><span class="sub" id="k3s">&nbsp;</span></div>
+    <div><small>Challenged</small><b id="k4">—</b><span class="sub">of the claimed amount</span></div>
+    <div><small>Overall action</small><b id="k5" style="font-size:14px;margin-top:6px">—</b><span class="sub" id="k5s">&nbsp;</span></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="panel">
+      <div class="ph"><h2>Scenario</h2></div>
+      <div class="tabs" id="modes"></div>
+      <div id="scns"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>Evidence</h2><span class="hint" id="studiohint"></span></div>
+      <div class="pb">
+        <div id="studio"><div class="empty">Loading…</div></div>
+        <div class="claimrow">
+          <label class="f money"><span>Carrier claimed</span><input id="claimed" type="number" step="0.01" min="0"></label>
+          <button class="btn primary" id="submitBtn">Submit for settlement</button>
+          <button class="btn" id="memoBtn">Dispute memo (PDF)</button>
+          <span class="hint" id="previewHint"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <div class="ph"><h2>Result</h2><span id="rtag"></span><span class="hint" id="rproof"></span></div>
+    <div id="alerts" style="padding:0 16px"></div>
+    <div id="resultTable"><div class="empty">Choose a scenario to see the result.</div></div>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1.6fr 1fr;margin-top:16px">
+    <div class="panel"><div class="ph"><h2>Cases from this settlement</h2><span class="hint">Every decision is permission-checked and audited</span></div><div id="wcases"><div class="empty">Submit a settlement to open its cases.</div></div></div>
+    <div class="panel"><div class="ph"><h2>Recent changes</h2></div><div class="pb"><div id="waudit" class="log"></div></div></div>
+  </div>
+</section>
+
+<!-- ============ CASES ============ -->
+<section class="view" id="v-cases">
+  <div class="grid" style="grid-template-columns:1.8fr 1fr">
+    <div class="panel"><div class="ph"><h2>All cases</h2></div><div class="pb" style="border-bottom:1px solid var(--line2)"><div class="filters" id="cfilters"></div></div><div id="clist"></div></div>
+    <div class="panel"><div class="ph"><h2>Recent changes</h2></div><div class="pb"><div id="caudit" class="log"></div></div></div>
+  </div>
+</section>
+
+<!-- ============ PREVENTION ============ -->
+<section class="view" id="v-prev">
+  <div class="grid" style="grid-template-columns:1.5fr 1fr">
+    <div class="panel"><div class="ph"><h2>Open movements needing attention</h2></div>
+      <div class="pb" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;border-bottom:1px solid var(--line2)">
+        <label class="f" style="margin:0;width:220px"><span>Evaluate as of (UTC, optional)</span><input type="datetime-local" id="asof"></label>
+        <button class="btn primary" id="prevGo">Refresh</button><button class="btn" id="prevNotify">Send to TMS</button></div>
+      <div id="alertsList"></div></div>
+    <div class="panel"><div class="ph"><h2>Event lab</h2><span class="hint">Record gate and check-in events</span></div><div class="pb">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px">
+        <label class="f"><span>Movement</span><input id="lm" value="LAB-1"></label><label class="f"><span>Carrier</span><input id="lc" value="CARR-7"></label>
+        <label class="f"><span>BOL</span><input id="lb" value="LAB-BOL"></label><label class="f"><span>Trailer or job</span><input id="lr" value="T1"></label>
+        <label class="f"><span>Location (optional)</span><input id="ll" placeholder="e.g. DC-CHI"></label></div>
+      <div id="evrows"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="addEv">Add event</button><button class="btn" id="demoEv">Fill example</button><button class="btn primary" id="sendEv">Send events</button></div>
+      <div id="labOut" style="margin-top:12px"></div></div></div>
+  </div>
+</section>
+
+<!-- ============ OPERATIONS ============ -->
+<section class="view" id="v-ops">
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="panel"><div class="ph"><h2>Repeated causes by facility</h2></div><div id="opsReport"></div></div>
+    <div class="panel"><div class="ph"><h2>Integrations</h2></div><div id="opsInteg"></div></div>
+    <div class="panel"><div class="ph"><h2>Outbound queue</h2></div><div id="opsOut"></div></div>
+    <div class="panel"><div class="ph"><h2>Evidence documents</h2></div><div class="pb">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 10px"><label class="f"><span>Movement</span><input id="docm"></label><label class="f"><span>Document kind</span><input id="dock" placeholder="APPOINTMENT_CONFIRMATION"></label></div>
+      <div class="drop" id="drop">Drop a file here or <button class="linkbtn" id="pick" style="font-size:14px">browse</button><input type="file" id="docfile" hidden></div></div>
+      <div id="docList"></div></div>
+  </div>
+</section>
+</div>
+</div>
+
+<div class="scrim" id="scrim"><div class="modal" id="modal"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const API='/api/v1/reconcile';
+const S={cfg:null,scenarios:[],mode:null,cur:null,result:null,saved:null,dtypes:[],etypes:[],cases:[],timer:null,seq:0,token:0,axis:null};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const money=n=>'$'+Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(Math.round(m%60)).padStart(2,'0');
+const toMin=iso=>+iso.slice(11,13)*60+ +iso.slice(14,16);
+const setMin=(iso,m)=>iso.slice(0,11)+fmt(m)+':00';
+const clone=o=>JSON.parse(JSON.stringify(o));
+const STATUS_CLS={READY_TO_POST:'ok',PAID:'ok',AGREED:'ok',CORRECTION_REQUESTED:'warn',OPEN_ALERT:'warn',AWAITING_EVIDENCE:'info',CARRIER_RESPONDED:'info',CONTRACT_REVIEW:'info',DISPUTE_REVIEW:'bad',DISPUTED:'bad'};
+const label=s=>String(s).replace(/_/g,' ').toLowerCase().replace(/^./,c=>c.toUpperCase());
+const stChip=s=>`<span class="chip ${STATUS_CLS[s]||'neu'}">${esc(label(s))}</span>`;
+const ACT_LABEL={APPROVE:'Approve',PARTIAL_APPROVE:'Partial approve',REQUEST_MISSING_PROOF:'Proof needed',HITL_REVIEW:'Needs review'};
+const actChip=a=>`<span class="chip ${a}">${esc(ACT_LABEL[a]||label(a))}</span>`;
+const NOSLOT='NO_SLOTS_OFFERED';
+
+/* ---------- plumbing ---------- */
+function toast(msg,kind){const t=document.createElement('div');t.className='toast '+(kind||'');t.textContent=msg;$('#toasts').appendChild(t);setTimeout(()=>t.remove(),4000)}
+function hdrs(){const h={'Content-Type':'application/json'};let k=null;try{k=sessionStorage.getItem('vk')}catch(e){}if(k)h['X-API-Key']=k;return h}
+async function api(path,method='GET',body,raw){
+  const r=await fetch(API+path,{method,headers:hdrs(),body:body===undefined?undefined:JSON.stringify(body)});
+  if(r.status===401){askKey();throw new Error('API key required')}
+  if(!r.ok){let d=await r.text();try{const j=JSON.parse(d);d=typeof j.detail==='string'?j.detail:JSON.stringify(j.detail)}catch(e){}throw new Error(d||r.statusText)}
+  return raw?r:r.json()}
+function askKey(){modal(`<h3>API key</h3><p>This server requires an API key.</p><label class="f"><span>Key</span><input id="mkey" type="password"></label><div style="text-align:right"><button class="btn primary" id="mok">Save</button></div>`);
+  $('#mok').onclick=()=>{try{sessionStorage.setItem('vk',$('#mkey').value)}catch(e){}closeModal();boot()}}
+function modal(html){$('#modal').innerHTML=html;$('#scrim').classList.add('on')}
+function closeModal(){$('#scrim').classList.remove('on')}
+$('#scrim').addEventListener('mousedown',e=>{if(e.target.id==='scrim')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
+const TITLES={work:['Settlements','Check a carrier bill against the contract and recorded events.'],cases:['Cases','Work items opened by each settlement.'],prev:['Prevention','Catch charges before they are billed.'],ops:['Operations','Reports, integrations and evidence documents.']};
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(!b)return;$$('#nav button').forEach(x=>x.classList.toggle('on',x===b));$$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));
+  $('#ptitle').textContent=TITLES[b.dataset.v][0];$('#psub').textContent=TITLES[b.dataset.v][1];({cases:loadCases,prev:()=>loadPrevention(false),ops:loadOps}[b.dataset.v]||(()=>{}))()};
+$('#keybtn').onclick=askKey;
+$('#resetbtn').onclick=async()=>{if(!confirm('Reset all demo data (cases, audit history, settlements)?'))return;try{await api('/reset','POST',{});toast('Demo data cleared');S.saved=null;refreshAll()}catch(e){toast(e.message,'err')}};
+
+/* ---------- boot ---------- */
+async function boot(){
+  try{S.cfg=await api('/config');S.scenarios=await api('/scenarios');[S.dtypes,S.etypes]=await Promise.all([api('/decision-types'),api('/event-types')])}
+  catch(e){if(!/key required/.test(e.message))toast(e.message,'err');return}
+  $('#health').classList.add('up');$('#envtxt').textContent=S.cfg.auth_enabled?'Secured':'Local mode';$('#keybtn').hidden=!S.cfg.auth_enabled;$('#resetbtn').hidden=!S.cfg.allow_reset;
+  const modes=[...new Map(S.scenarios.map(s=>[s.mode,s.mode_label])).entries()];
+  $('#modes').innerHTML=modes.map(([m,l])=>`<button data-m="${esc(m)}">${esc(l)}</button>`).join('');
+  $('#modes').onclick=e=>{const b=e.target.closest('button');if(b)setMode(b.dataset.m)};
+  const start=S.scenarios.find(s=>s.name==='B')||S.scenarios[0];setMode(start.mode,start.name);refreshAudit()}
+function setMode(m,name){S.mode=m;$$('#modes button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  const list=S.scenarios.filter(s=>s.mode===m);
+  $('#scns').innerHTML=list.map(s=>{const [l,...rest]=s.label.split(' · ');return `<button class="scn" data-n="${esc(s.name)}"><span class="let">${esc(l)}</span><div><b>${esc(rest.join(' · ')||s.label)}</b><span>${esc(s.description)}</span></div></button>`}).join('');
+  $('#scns').onclick=e=>{const b=e.target.closest('.scn');if(b)pick(b.dataset.n,true)};
+  pick(name||list[0].name,false)}
+
+/* ---------- evidence ---------- */
+function pick(name,commit){const s=S.scenarios.find(x=>x.name===name);S.cur={s,req:clone(s.request)};S.result=null;S.axis=null;
+  $$('.scn').forEach(b=>b.classList.toggle('on',b.dataset.n===name));$('#claimed').value=S.cur.req.claimed_charges[0].amount;drawStudio();
+  if(commit)submit();else preview()}
+const GROUPS=['tl','service'];
+function tfields(){const ev=S.cur.req.evidence;for(const k of GROUPS)if(ev[k])return Object.keys(ev[k]).filter(f=>/_time$|check_in$|sign_off$/.test(f)).map(f=>[k,f]);return[]}
+function labelFor(f){const t=S.etypes.find(x=>x.evidence_field===f);return t?t.description.replace(/\s*\(.*\)/,''):f.replace(/_/g,' ')}
+const PALETTE=['#1d4ed8','#0f766e','#b45309','#6d28d9','#be123c','#475569'];
+function drawStudio(){const ev=S.cur.req.evidence,box=$('#studio');
+  if(ev.demurrage){box.innerHTML=dayStrip();$('#studiohint').textContent='Click a chargeable day to mark "no pickup slots offered".';bindDays();return}
+  if(!tfields().length){box.innerHTML='<div class="empty">No adjustable evidence for this scenario.</div>';$('#studiohint').textContent='';return}
+  $('#studiohint').textContent='Drag a marker to change a time. Double-click to remove a record.';
+  box.innerHTML='<svg id="tl" viewBox="0 0 1000 170" role="img" aria-label="Evidence timeline"></svg><div class="tray" id="tray"></div><div class="legend" id="legend"></div>';
+  fitAxis();drawTimeline();bindTimeline()}
+function axis(){return S.axis||{a:S.cfg.day_start,b:S.cfg.day_end}}
+function fitAxis(){const ev=S.cur.req.evidence,ms=tfields().filter(([k,f])=>ev[k][f]).map(([k,f])=>toMin(ev[k][f]));const {day_start:d0,day_end:d1}=S.cfg;
+  if(!ms.length){S.axis={a:d0,b:d1};return}
+  let a=Math.floor((Math.min(...ms)-120)/60)*60,b=Math.ceil((Math.max(...ms)+120)/60)*60;if(b-a<360){const c=(a+b)/2;a=Math.floor((c-180)/60)*60;b=a+360}
+  a=Math.max(d0,a);b=Math.min(d1,Math.max(b,a+360));if(b-a<360)a=Math.max(d0,b-360);S.axis={a,b}}
+function X(m){const {a,b}=axis();return 40+(m-a)/(b-a)*920}
+function drawTimeline(){const {a,b}=axis(),ev=S.cur.req.evidence,tf=tfields(),svg=$('#tl');
+  let h=`<line x1="40" y1="130" x2="960" y2="130" stroke="#cfd5dd" stroke-width="2"/>`;
+  h+=bandsSvg();
+  for(let m=Math.ceil(a/60)*60;m<=b;m+=60)h+=`<line x1="${X(m)}" y1="130" x2="${X(m)}" y2="137" stroke="#98a2b3"/><text x="${X(m)}" y="152" fill="#627084" font-size="12" text-anchor="middle">${fmt(m)}</text>`;
+  const present=tf.filter(([k,f])=>ev[k][f]).map(([k,f])=>({k,f,m:toMin(ev[k][f])})).sort((p,q)=>p.m-q.m);
+  const gap=158,n=present.length;let lx=present.map(p=>Math.max(80,X(p.m)));
+  for(let i=1;i<n;i++)lx[i]=Math.max(lx[i],lx[i-1]+gap);
+  const over=n?lx[n-1]-925:0;if(over>0){lx[n-1]-=over;for(let i=n-2;i>=0;i--)lx[i]=Math.min(lx[i],lx[i+1]-gap)}
+  present.forEach((p,j)=>{const c=PALETTE[tf.findIndex(t=>t[1]===p.f)%PALETTE.length],x=X(p.m),l=lx[j];
+    h+=`<g class="pin" data-k="${p.k}" data-f="${p.f}"><path d="M${x} 124 C${x} 92,${l} 96,${l} 58" fill="none" stroke="${c}" stroke-width="1.4"/>
+      <circle cx="${x}" cy="130" r="7" fill="${c}" stroke="#fff" stroke-width="2"/>
+      <text x="${l}" y="32" fill="#1c2430" font-size="13" font-weight="600" text-anchor="middle">${esc(labelFor(p.f))}</text>
+      <text x="${l}" y="49" fill="${c}" font-size="13" font-weight="700" text-anchor="middle">${fmt(p.m)}</text></g>`});
+  svg.innerHTML=h;
+  const miss=tf.filter(([k,f])=>!ev[k][f]);
+  $('#tray').innerHTML=miss.map(([k,f])=>`<button class="btn sm" data-add="${k}.${f}">Add ${esc(labelFor(f).toLowerCase())} <span class="hint">(not recorded)</span></button>`).join('');
+  $('#legend').innerHTML=bandLegend()}
+function bandInfo(){const r=S.result;if(!r)return null;const ev=S.cur.req.evidence;
+  if(ev.tl){const li=r.line_items.find(l=>l.charge_code==='DET');if(!li)return null;
+    const m=/Elapsed (\d+) min - free (\d+) - excepted (\d+) = (\d+) billable/.exec(li.findings);const cs=li.proof_references.find(p=>p.startsWith('clock_start:')),rl=li.proof_references.find(p=>p.startsWith('release:'));
+    if(!m||!cs||!rl)return null;
+    const loc=iso=>{const d=new Date(iso.split(':').slice(1).join(':'));const p=new Intl.DateTimeFormat('en-GB',{timeZone:S.cfg.timezone,hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(d);return +p.find(x=>x.type==='hour').value%24*60+ +p.find(x=>x.type==='minute').value};
+    const s0=loc(cs),e0=loc(rl),free=+m[2];return{s:s0,e:e0,mid:Math.min(e0,s0+free+(+m[3])),freeLabel:`Free time (${free} min)`,billLabel:`Billable (${m[4]} min)`}}
+  if(ev.service){const li=r.line_items.find(l=>l.charge_code==='SVC');if(!li)return null;const m=/Actual ([\d.]+)h, package ([\d.]+)h/.exec(li.findings),s=ev.service;
+    if(!m||!s.technician_check_in||!s.customer_otp_sign_off)return null;const s0=toMin(s.technician_check_in),e0=toMin(s.customer_otp_sign_off);
+    return{s:s0,e:e0,mid:Math.min(e0,s0+(+m[2])*60),freeLabel:`Package (${m[2]} h)`,billLabel:`Overtime (${Math.max(0,+m[1]-+m[2]).toFixed(2)} h)`}}
+  return null}
+function bandsSvg(){const b=bandInfo();if(!b)return'';
+  return `<rect x="${X(b.s)}" y="119" width="${Math.max(0,X(b.mid)-X(b.s))}" height="22" fill="#cfe9db"/>`+(b.e>b.mid?`<rect x="${X(b.mid)}" y="119" width="${X(b.e)-X(b.mid)}" height="22" fill="#f6d9a3"/>`:'')}
+function bandLegend(){const b=bandInfo();return b?`<span><i style="background:#cfe9db"></i>${esc(b.freeLabel)}</span><span><i style="background:#f6d9a3"></i>${esc(b.billLabel)}</span>`:'<span>Bands for free and billable time appear once the contract clock has run.</span>'}
+function bindTimeline(){const svg=$('#tl');let drag=null;
+  const m_at=ev=>{const r=svg.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width*1000,{a,b}=axis(),step=S.cfg.step;let m=a+(x-40)/920*(b-a);m=Math.round(m/step)*step;return Math.max(a,Math.min(b,m))};
+  svg.onpointerdown=e=>{const g=e.target.closest('.pin');if(!g)return;drag={k:g.dataset.k,f:g.dataset.f};svg.setPointerCapture(e.pointerId)};
+  svg.onpointermove=e=>{if(!drag)return;const ev=S.cur.req.evidence[drag.k];ev[drag.f]=setMin(ev[drag.f],m_at(e));drawTimeline()};
+  svg.onpointerup=()=>{if(drag){drag=null;fitAxis();drawTimeline();preview()}};
+  svg.ondblclick=e=>{const g=e.target.closest('.pin');if(!g)return;S.cur.req.evidence[g.dataset.k][g.dataset.f]=null;fitAxis();drawTimeline();preview()};
+  $('#tray').onclick=e=>{const b=e.target.closest('[data-add]');if(!b)return;const [k,f]=b.dataset.add.split('.'),ev=S.cur.req.evidence[k];
+    const base=Object.values(ev).find(v=>typeof v==='string'&&v.includes('T'))||S.cur.s.request.evidence[k][f]||new Date().toISOString().slice(0,19);
+    const {a,b:z}=axis(),step=S.cfg.step;ev[f]=setMin(base,Math.round((a+z)/2/step)*step);fitAxis();drawTimeline();preview()}}
+function dayStrip(){const d=S.cur.req.evidence.demurrage,days=[];
+  for(let x=new Date(d.available_date+'T00:00:00Z');;x=new Date(x.getTime()+864e5)){const s=x.toISOString().slice(0,10);if(s>d.gate_out_date)break;days.push(s)}
+  const noslot=new Set((d.pickup_attempts||[]).filter(a=>a.outcome===NOSLOT).map(a=>a.date));
+  return '<div class="daystrip">'+days.map(s=>{const free=s<=d.last_free_day,dt=new Date(s+'T00:00:00Z');
+    return `<div class="day ${free?'free':'chg'} ${noslot.has(s)?'noslot':''}" data-d="${s}"><small>${dt.toLocaleDateString('en-US',{weekday:'short',timeZone:'UTC'})}</small><b>${dt.getUTCDate()}</b><small>${free?(s===d.last_free_day?'last free day':'free'):(noslot.has(s)?'no slots offered':'chargeable')}</small></div>`}).join('')+'</div>'}
+function bindDays(){$('#studio').onclick=e=>{const c=e.target.closest('.day.chg');if(!c)return;const d=S.cur.req.evidence.demurrage,s=c.dataset.d;
+  const has=(d.pickup_attempts||[]).some(a=>a.date===s&&a.outcome===NOSLOT);d.pickup_attempts=(d.pickup_attempts||[]).filter(a=>a.date!==s);
+  if(!has)d.pickup_attempts.push({date:s,outcome:NOSLOT,reference:null});delete d.documented_no_appointment_dates;$('#studio').innerHTML=dayStrip();preview()}}
+$('#claimed').oninput=()=>{S.cur.req.claimed_charges[0].amount=+$('#claimed').value||0;preview()};
+
+/* ---------- running ---------- */
+function runBody(extra){const run=Date.now().toString(36)+(++S.token);const r=JSON.parse(JSON.stringify(S.cur.req).replaceAll('{{RUN}}',run));r.movement_id=`MOV-${run}`;return {...r,...(extra||{})}}
+function preview(){clearTimeout(S.timer);const rep=S.cur.s.repeat>1;
+  $('#previewHint').textContent=rep?'This scenario submits the same bill twice, so use "Submit for settlement".':'Changes recalculate automatically. Nothing is saved until you submit.';
+  if(rep)return;const my=++S.seq;
+  S.timer=setTimeout(async()=>{try{const r=await api('/actual','POST',runBody({dry_run:true}));if(my!==S.seq)return;S.result=r;render(r,false)}catch(e){if(my===S.seq)toast(e.message,'err')}},180)}
+async function submit(){clearTimeout(S.timer);const my=++S.seq,btn=$('#submitBtn');btn.disabled=true;
+  try{const base=runBody();let res;for(let i=1;i<=S.cur.s.repeat;i++)res=await api('/actual','POST',{...base,movement_id:`${base.movement_id}-${i}`});
+    if(my!==S.seq)return;S.result=res;S.saved=res;render(res,true);toast('Settlement saved');await loadWorkCases(res.movement_id);refreshAudit()}
+  catch(e){toast(e.message,'err')}finally{btn.disabled=false}}
+$('#submitBtn').onclick=submit;
+$('#memoBtn').onclick=async()=>{if(!S.saved)return toast('Submit a settlement first','err');
+  try{const r=await api('/dispute-memo','POST',{movement_id:S.saved.movement_id},true);window.open(URL.createObjectURL(await r.blob()))}
+  catch(e){toast(/variance/.test(e.message)?'Nothing to dispute: no variance.':e.message,/variance/.test(e.message)?'':'err')}};
+
+/* ---------- result ---------- */
+function render(r,saved){
+  $('#rtag').innerHTML=saved?'<span class="state sv">Saved</span>':'<span class="state pv">Preview, not saved</span>';
+  $('#rproof').textContent=saved?`Proof pack ${r.audit_proof_pack_id}`:'';
+  const pct=r.total_claimed?Math.round(r.total_variance/r.total_claimed*100):0;
+  $('#k1').textContent=money(r.total_claimed);$('#k2').textContent=money(r.total_supported);$('#k3').textContent=money(r.total_variance);$('#k4').textContent=pct+'%';
+  $('#k1s').textContent=`${r.line_items.length} charge line${r.line_items.length===1?'':'s'}`;$('#k2s').textContent=r.provisional_total!=null?`pre-bill ${money(r.provisional_total)}`:'no pre-bill on file';
+  $('#k3s').textContent=r.total_variance>0?'returned to carrier or reviewed':'nothing to dispute';$('#k5').innerHTML=actChip(r.overall_action);$('#k5s').textContent=r.fraud_alerts.length?`${r.fraud_alerts.length} alert${r.fraud_alerts.length>1?'s':''} raised`:'no alerts';
+  $('#alerts').innerHTML=r.fraud_alerts.map(a=>`<div class="alert" style="margin-top:12px">${esc(a.startsWith('DUPLICATE')?'Duplicate invoice alert: '+a:a)}</div>`).join('');
+  $('#resultTable').innerHTML=`<table><tr><th>Charge</th><th class="n">Pre-bill</th><th class="n">Claimed</th><th class="n">Supported</th><th class="n">Variance</th><th>Action</th><th>Basis</th></tr>`+
+   r.line_items.map((l,i)=>{const ratio=l.amount_claimed?Math.min(100,l.amount_supported/l.amount_claimed*100):0;
+    return `<tr class="line" data-i="${i}"><td><b>${esc(l.charge_code)}</b><div class="hint">${esc(l.description)}</div></td><td class="n">${l.provisional_amount==null?'—':money(l.provisional_amount)}</td><td class="n">${money(l.amount_claimed)}</td>
+     <td class="n">${money(l.amount_supported)}<span class="minibar"><i style="width:${ratio}%"></i></span></td><td class="n" style="${l.variance>0?'color:var(--warn);font-weight:600':''}">${money(l.variance)}</td>
+     <td>${actChip(l.recommended_action)}<div class="hint" style="margin-top:3px">${esc(l.reason_code==='NONE'?'Matches contract':label(l.reason_code))}</div></td><td style="max-width:340px">${esc(l.findings.length>130?l.findings.slice(0,130)+'…':l.findings)} <span class="hint">Details</span></td></tr>
+     <tr class="det" id="det${i}" hidden><td colspan="7"><div class="cols"><div><h4>Evidence facts</h4>${l.evidence_facts.length?'<ul>'+l.evidence_facts.map(f=>`<li>${esc(f)}</li>`).join('')+'</ul>':'<span class="hint">No recorded facts for this charge.</span>'}
+      ${l.clause?`<div class="clause"><b>Contract clause ${esc(l.clause)}</b></div>`:''}</div>
+      <div><h4>Explanation</h4>${esc(l.findings)}<div class="own"><b>Owner:</b> ${esc(l.decision_owner)}<br><b>Next step:</b> ${esc(l.next_action)}</div></div></div></td></tr>`}).join('')+
+   `<tr><td><b>Total</b></td><td class="n"><b>${r.provisional_total==null?'—':money(r.provisional_total)}</b></td><td class="n"><b>${money(r.total_claimed)}</b></td><td class="n"><b>${money(r.total_supported)}</b></td><td class="n"><b>${money(r.total_variance)}</b></td><td colspan="2">${actChip(r.overall_action)}</td></tr></table>`;
+  $('#resultTable').onclick=e=>{const tr=e.target.closest('tr.line');if(tr){const d=$('#det'+tr.dataset.i);d.hidden=!d.hidden}};
+  if($('#tl'))drawTimeline()}
+
+/* ---------- cases ---------- */
+function caseRows(cs){return cs.length?`<table><tr><th>Charge</th><th>Status</th><th class="n">Claimed</th><th class="n">Supported</th><th>Owner</th><th>Actions</th></tr>`+cs.map(c=>{const allowed=S.dtypes.filter(d=>!d.allowed_from.length||d.allowed_from.includes(c.status));
+  return `<tr><td><b>${esc(c.charge_code)}</b><div class="hint">${esc(c.movement_id.slice(-10))}</div></td><td>${stChip(c.status)}<div class="hint" style="margin-top:3px">${esc(c.reason_code==='NONE'?'Matches contract':label(c.reason_code))}</div></td><td class="n">${money(c.claimed)}</td>
+   <td class="n">${money(c.supported)}${c.agreed_amount!=null?`<div class="hint">agreed ${money(c.agreed_amount)}</div>`:''}${c.paid_amount!=null?`<div class="hint">paid ${money(c.paid_amount)} ${esc(c.paid_reference||'')}</div>`:''}</td>
+   <td style="max-width:200px">${esc(c.decision_owner)}</td><td><div class="acts">${allowed.map(d=>`<button class="btn sm" data-dec="${esc(d.code)}" data-m="${esc(c.movement_id)}" data-c="${esc(c.charge_code)}">${esc(label(d.code))}</button>`).join('')}</div></td></tr>`}).join('')+'</table>':'<div class="empty">No cases yet.</div>'}
+async function loadWorkCases(mid){S.cases=await api('/cases?movement_id='+encodeURIComponent(mid));$('#wcases').innerHTML=caseRows(S.cases)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-dec]');if(b)openDecision(b.dataset.dec,b.dataset.m,b.dataset.c)});
+function openDecision(code,mid,cc){const d=S.dtypes.find(x=>x.code===code),c=S.cases.find(x=>x.movement_id===mid&&x.charge_code===cc)||{claimed:0,supported:0};
+  const hints={ACCEPT:'Approve the supported amount for posting.',DISPUTE:'Formally contest the difference with the carrier.',CARRIER_RESPONSE:"Record the carrier's reply.",AGREE_SETTLEMENT:'Record the amount both sides agreed.',WRITE_OFF:'Give up the disputed amount. Large amounts need a manager.',OVERRIDE_AMOUNT:'Manually set the supported amount.',MARK_PAID:'Record payment against the agreed or supported amount.'};
+  modal(`<h3>${esc(label(code))}</h3><p>${esc(hints[code]||'')} ${esc(cc)}: claimed ${money(c.claimed)}, supported ${money(c.supported)}.</p>
+   ${d.requires_reason?'<label class="f"><span>Reason (recorded in the audit trail)</span><textarea id="mr" rows="3"></textarea></label>':''}
+   ${d.needs_amount?`<label class="f"><span>Amount ($)${code==='MARK_PAID'?' (blank = agreed or supported)':''}</span><input id="ma" type="number" step="0.01" min="0" value="${code==='AGREE_SETTLEMENT'||code==='MARK_PAID'?c.supported:''}"></label>`:''}
+   ${d.needs_reference?'<label class="f"><span>Reference (payment or agreement id)</span><input id="mf"></label>':''}
+   <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="mc">Cancel</button><button class="btn primary" id="mok">Confirm</button></div>`);
+  $('#mc').onclick=closeModal;
+  $('#mok').onclick=async()=>{const body={movement_id:mid,charge_code:cc,decision:code};
+    if(d.requires_reason){body.reason=$('#mr').value.trim();if(!body.reason)return toast('A reason is required','err')}
+    if(d.needs_amount&&$('#ma').value!=='')body.amount=+$('#ma').value;if(d.needs_reference&&$('#mf').value)body.reference=$('#mf').value;
+    try{await api('/decisions','POST',body);closeModal();toast(label(code)+' recorded');refreshAll()}catch(e){toast(e.message,'err')}}}
+async function refreshAll(){if(S.saved)loadWorkCases(S.saved.movement_id);refreshAudit();if($('#v-cases').classList.contains('on'))loadCases()}
+const nice=v=>v==null?'—':(/^[A-Z][A-Z_]+$/.test(v)?label(v):v);
+function auditHtml(rows){return rows.length?rows.map(r=>`<div class="t">${esc(r.at.slice(11,16))}</div><div><b>${esc(r.entity_id)}</b> ${esc(label(r.field).toLowerCase())}: ${esc(nice(r.old))} to ${esc(nice(r.new))}<div class="hint">${esc(r.actor)} (${esc(r.role)}): ${esc(r.reason)}</div></div>`).join(''):'<div class="hint" style="grid-column:1/-1">No manual changes yet.</div>'}
+async function refreshAudit(){try{const rows=await api('/audit-log?limit=12');$('#waudit').innerHTML=auditHtml(rows);$('#caudit').innerHTML=auditHtml(rows)}catch(e){}}
+let cfilter='';
+async function loadCases(){try{const all=await api('/cases?limit=200');S.cases=all;const sts=[...new Set(all.map(c=>c.status))];
+  $('#cfilters').innerHTML=`<button class="btn sm ${cfilter?'':'on'}" data-f="">All (${all.length})</button>`+sts.map(s=>`<button class="btn sm ${cfilter===s?'on':''}" data-f="${s}">${esc(label(s))} (${all.filter(c=>c.status===s).length})</button>`).join('');
+  $('#cfilters').onclick=e=>{const b=e.target.closest('[data-f]');if(b){cfilter=b.dataset.f;loadCases()}};
+  $('#clist').innerHTML=caseRows(cfilter?all.filter(c=>c.status===cfilter):all);refreshAudit()}catch(e){toast(e.message,'err')}}
+
+/* ---------- prevention + event lab ---------- */
+async function loadPrevention(notify){const v=$('#asof').value;const q=(v?`as_of=${v}:00Z`:'')+(notify?(v?'&':'')+'notify=true':'');
+  try{const a=await api('/prevention'+(q?'?'+q:''));
+    $('#alertsList').innerHTML=a.length?'<table><tr><th>Movement</th><th>Alert</th><th class="n">Free time left</th><th>Detail</th><th>Owner and next step</th></tr>'+a.map(x=>`<tr><td><b>${esc(x.movement_id)}</b><div class="hint">${esc(x.carrier_id)}</div></td><td><span class="chip ${x.alert_type==='PREVENT_EXCEEDED'?'bad':'warn'}">${esc(label(x.alert_type.replace('PREVENT_','')))}</span></td>
+      <td class="n" style="color:${x.minutes_remaining!=null&&x.minutes_remaining<=0?'var(--bad)':'inherit'}">${x.minutes_remaining==null?'—':Math.round(x.minutes_remaining)+' min'}</td><td>${esc(x.detail)}</td><td><b>${esc(x.decision_owner)}</b><div class="hint">${esc(x.next_action)}</div></td></tr>`).join('')+'</table>':'<div class="empty">No open movements need attention.</div>';
+    if(notify)toast('Alerts queued for the TMS target')}catch(e){toast(e.message,'err')}}
+$('#prevGo').onclick=()=>loadPrevention(false);$('#prevNotify').onclick=()=>loadPrevention(true);
+let evRows=[];
+function evRowHtml(r,i){const t=S.etypes.find(x=>x.code===r.type)||S.etypes[0];
+  return `<div class="evrow"><select data-i="${i}" data-w="type">${S.etypes.map(x=>`<option value="${esc(x.code)}" ${x.code===r.type?'selected':''}>${esc(x.description)}</option>`).join('')}</select>
+   <select data-i="${i}" data-w="source">${t.sources.map(s=>`<option ${s.source===r.source?'selected':''}>${esc(s.source)}</option>`).join('')}</select>
+   <input type="datetime-local" data-i="${i}" data-w="at" value="${esc(r.at)}"><button class="btn sm" data-rm="${i}">Remove</button></div>`}
+function drawEv(){$('#evrows').innerHTML=evRows.map(evRowHtml).join('')||'<div class="hint" style="margin-bottom:10px">No events yet. Add one, or fill the example.</div>'}
+function newEv(type,h,m){const t=S.etypes.find(x=>x.code===type)||S.etypes[0],d=new Date().toISOString().slice(0,10);return{type:t.code,source:(t.sources[0]||{}).source,at:`${d}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`}}
+$('#addEv').onclick=()=>{if(!S.etypes.length)return;evRows.push(newEv(S.etypes[0].code,9,0));drawEv()};
+$('#demoEv').onclick=()=>{const id='LAB-'+Date.now().toString(36).slice(-4).toUpperCase();$('#lm').value=id;$('#lb').value=id+'-BOL';evRows=[newEv('APPOINTMENT',9,0),newEv('ARRIVAL',8,45),newEv('CHECK_IN',8,55)];drawEv()};
+$('#evrows').onchange=e=>{const i=e.target.dataset.i;if(i==null)return;const w=e.target.dataset.w;evRows[i][w]=e.target.value;if(w==='type'){evRows[i].source=(S.etypes.find(x=>x.code===e.target.value).sources[0]||{}).source;drawEv()}};
+$('#evrows').onclick=e=>{const b=e.target.closest('[data-rm]');if(b){evRows.splice(+b.dataset.rm,1);drawEv()}};
+$('#sendEv').onclick=async()=>{if(!evRows.length)return toast('Add at least one event','err');
+  try{const r=await api('/events','POST',{movement_id:$('#lm').value,carrier_id:$('#lc').value,bol_number:$('#lb').value,container_or_job_id:$('#lr').value,location:$('#ll').value||null,events:evRows.map(x=>({event_type:x.type,source:x.source,occurred_at:x.at+':00'}))});
+    $('#labOut').innerHTML=`<span class="chip ok">${r.event_ids.length} events recorded</span> `+(r.proposal?`<span class="chip info">Auto-priced: ${r.proposal.line_items.map(l=>esc(l.charge_code)+' '+money(l.amount_supported)).join(', ')}</span>`:'<span class="hint">A release or sign-off event prices the charge automatically.</span>');
+    toast('Events recorded');loadPrevention(false)}catch(e){toast(e.message,'err')}};
+
+/* ---------- operations ---------- */
+const tbl=(cols,rows)=>rows.length?'<table><tr>'+cols.map(c=>`<th>${c[0]}</th>`).join('')+'</tr>'+rows.map(r=>'<tr>'+cols.map(c=>`<td>${c[1](r)}</td>`).join('')+'</tr>').join('')+'</table>':'<div class="empty">Nothing here yet.</div>';
+async function loadOps(){try{
+  $('#opsReport').innerHTML=tbl([['Facility',r=>esc(r.location)],['Cause',r=>esc(label(r.reason_code))],['Charge',r=>esc(r.charge_code)],['Cases',r=>r.cases],['Disputed',r=>money(r.disputed_value)],['',r=>r.repeated?'<span class="chip bad">Repeated</span>':'']],await api('/reports/repeat-causes'));
+  const i=await api('/integrations');
+  $('#opsInteg').innerHTML=tbl([['Name',r=>`<b>${esc(r.n)}</b><div class="hint">${esc(r.d)}</div>`],['Direction',r=>esc(r.t)],['Status',r=>`<span class="chip ${r.on?'ok':'neu'}">${r.on?'Enabled':'Disabled'}</span>`]],
+    [...i.sources.map(s=>({n:s.name,d:s.description,t:'Inbound',on:s.enabled})),...i.targets.map(s=>({n:s.name,d:s.description,t:'Outbound',on:s.enabled}))]);
+  $('#opsOut').innerHTML=tbl([['#',r=>r.id],['Target',r=>esc(r.target)],['Outcome',r=>esc(label(r.kind))],['Movement',r=>esc(r.movement_id.slice(-10))],['Status',r=>stChip(r.status)]],await api('/outbox'));
+  if(!$('#docm').value&&S.saved)$('#docm').value=S.saved.movement_id;loadDocs()}catch(e){toast(e.message,'err')}}
+async function loadDocs(){const m=$('#docm').value;if(!m){$('#docList').innerHTML='';return}
+  try{$('#docList').innerHTML=tbl([['Kind',r=>esc(r.kind)],['File',r=>esc(r.filename)],['SHA-256',r=>esc(r.sha256.slice(0,12))+'…'],['Uploaded by',r=>esc(r.uploaded_by)]],await api('/documents?movement_id='+encodeURIComponent(m)))}catch(e){}}
+$('#docm').onchange=loadDocs;
+async function upload(f){const m=$('#docm').value||(S.saved&&S.saved.movement_id);if(!m)return toast('Enter a movement id first','err');$('#docm').value=m;const fd=new FormData();fd.append('file',f);
+  const h=hdrs();delete h['Content-Type'];const r=await fetch(`${API}/documents?movement_id=${encodeURIComponent(m)}&kind=${encodeURIComponent($('#dock').value||'EVIDENCE')}`,{method:'POST',headers:h,body:fd});
+  if(!r.ok)return toast(await r.text(),'err');toast('Document attached');loadDocs()}
+const drop=$('#drop');$('#pick').onclick=()=>$('#docfile').click();$('#docfile').onchange=e=>e.target.files[0]&&upload(e.target.files[0]);
+['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>e.dataTransfer.files[0]&&upload(e.dataTransfer.files[0]));
+
+drawEv();boot();
+</script>
+</body>
+</html>
