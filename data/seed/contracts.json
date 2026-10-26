@@ -1,0 +1,203 @@
+{
+  "contracts": [
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "LH",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "rate_per_mile": 2.5
+      },
+      "clause_ref": "3.1",
+      "clause_text": "Linehaul is billed at the contracted rate per mile."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "FSC",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "base_price": 1.25,
+        "mpg": 6.0
+      },
+      "clause_ref": "3.4",
+      "clause_text": "Fuel surcharge follows the prevailing Monday DOE diesel index."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "DET",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "start_rule": "APPOINTMENT_IF_ON_TIME",
+        "free_time_minutes": 120,
+        "hourly_rate": 75.0,
+        "rounding_rule": "EXACT",
+        "exceptions": {
+          "DOCK_NOT_READY_SHIPPER": {
+            "effect": "EXCLUDE_MINUTES",
+            "responsibility": "SHIPPER",
+            "proof": "DOCK_LOG"
+          },
+          "FORCE_MAJEURE": {
+            "effect": "REVIEW",
+            "responsibility": "UNDETERMINED",
+            "proof": "NOTICE"
+          }
+        }
+      },
+      "clause_ref": "4.2",
+      "clause_text": "Detention: two (2) free hours from the confirmed appointment when the driver arrives on time; $75.00 per hour thereafter."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "DEM",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "daily_rate_tiers": [
+          {
+            "from_day": 1,
+            "to_day": 4,
+            "rate": 100.0
+          },
+          {
+            "from_day": 5,
+            "to_day": null,
+            "rate": 250.0
+          }
+        ]
+      },
+      "clause_ref": "6.1",
+      "clause_text": "Demurrage accrues per calendar day after the last free day, tiered by day count; terminal-closed days excluded."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "OCN_DET",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "equipment_free_days": 4,
+        "daily_rate": 100.0
+      },
+      "clause_ref": "6.3",
+      "clause_text": "Equipment detention accrues after the agreed free days from gate-out to empty return."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "STOR",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "free_days": 3,
+        "daily_rate": 50.0
+      },
+      "clause_ref": "7.1",
+      "clause_text": "Storage accrues per day after the free days, excluding non-working days."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "SVC",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "base_package_hours": 4,
+        "base_package_fee": 800.0,
+        "overtime_hourly_rate": 100.0
+      },
+      "clause_ref": "9.1",
+      "clause_text": "Service package: base fee covers the package hours; overtime at the stated hourly rate; materials only if pre-authorized."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "RAIL_DEM",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "start_event": "CONSTRUCTIVE_PLACEMENT",
+        "free_days": 2,
+        "daily_rate_tiers": [
+          {
+            "from_day": 1,
+            "to_day": 3,
+            "rate": 75.0
+          },
+          {
+            "from_day": 4,
+            "to_day": null,
+            "rate": 150.0
+          }
+        ]
+      },
+      "clause_ref": "8.2",
+      "clause_text": "Railcar demurrage runs from constructive placement after the free days; tariff non-working days excluded."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "LTL_REDEL",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "flat_amount": 85.0,
+        "required_proofs": [
+          "PROOF_OF_ATTEMPT"
+        ]
+      },
+      "clause_ref": "5.4",
+      "clause_text": "Redelivery is billable only with proof of a delivery attempt."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "LTL_STOR",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "free_days": 2,
+        "daily_rate": 30.0,
+        "required_proofs": [
+          "FACILITY_HOURS"
+        ]
+      },
+      "clause_ref": "5.6",
+      "clause_text": "LTL terminal storage after the free days, with facility hours on file."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "LTL_RECON",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "flat_amount": 120.0,
+        "required_proofs": [
+          "PROOF_OF_ATTEMPT",
+          "FACILITY_HOURS"
+        ]
+      },
+      "clause_ref": "5.8",
+      "clause_text": "Reconsignment is billable with the consignee-change request and a delivery-attempt record."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "IM_STOR",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "start_event": "NOTICE",
+        "free_days": 2,
+        "daily_rate_tiers": [
+          {
+            "from_day": 1,
+            "to_day": 2,
+            "rate": 40.0
+          },
+          {
+            "from_day": 3,
+            "to_day": null,
+            "rate": 80.0
+          }
+        ]
+      },
+      "clause_ref": "10.2",
+      "clause_text": "Ramp storage runs from the ramp availability notice after the free days."
+    },
+    {
+      "carrier_id": "CARR-7",
+      "charge_code": "IM_DET",
+      "effective_from": "2024-01-01",
+      "terms": {
+        "equipment_free_days": 4,
+        "daily_rate": 95.0
+      },
+      "clause_ref": "10.4",
+      "clause_text": "Intermodal equipment detention after the free days from pickup."
+    }
+  ]
+}
