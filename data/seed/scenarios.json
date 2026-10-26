@@ -1,0 +1,205 @@
+{
+  "scenarios": [
+    {
+      "name": "A",
+      "label": "A \u00b7 Clean delivery",
+      "mode": "TL",
+      "repeat": 1,
+      "sort_order": 1,
+      "description": "Dwell inside free time: nothing billable, touchless approval.",
+      "request": {
+        "bol_number": "BOL-{{RUN}}",
+        "carrier_id": "CARR-7",
+        "container_or_job_id": "TRL-55",
+        "claimed_charges": [
+          {
+            "charge_code": "DET",
+            "amount": 0
+          }
+        ],
+        "evidence": {
+          "tl": {
+            "appointment_time": "{{DATE}}T09:00:00",
+            "arrival_time": "{{DATE}}T08:45:00",
+            "check_in_time": "{{DATE}}T08:55:00",
+            "release_time": "{{DATE}}T10:30:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "B",
+      "label": "B \u00b7 Overcharge claim",
+      "mode": "TL",
+      "repeat": 1,
+      "sort_order": 2,
+      "description": "Carrier bills 3.5 h; gate proof supports 1.5 h billable.",
+      "request": {
+        "bol_number": "BOL-{{RUN}}",
+        "carrier_id": "CARR-7",
+        "container_or_job_id": "TRL-55",
+        "claimed_charges": [
+          {
+            "charge_code": "DET",
+            "amount": 262.5
+          }
+        ],
+        "evidence": {
+          "tl": {
+            "appointment_time": "{{DATE}}T09:00:00",
+            "arrival_time": "{{DATE}}T08:45:00",
+            "check_in_time": "{{DATE}}T08:55:00",
+            "release_time": "{{DATE}}T12:30:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "C",
+      "label": "C \u00b7 Missing evidence",
+      "mode": "TL",
+      "repeat": 1,
+      "sort_order": 3,
+      "description": "No warehouse check-in record: request proof, never guess.",
+      "request": {
+        "bol_number": "BOL-{{RUN}}",
+        "carrier_id": "CARR-7",
+        "container_or_job_id": "TRL-55",
+        "claimed_charges": [
+          {
+            "charge_code": "DET",
+            "amount": 150
+          }
+        ],
+        "evidence": {
+          "tl": {
+            "appointment_time": "{{DATE}}T09:00:00",
+            "arrival_time": "{{DATE}}T08:45:00",
+            "check_in_time": null,
+            "release_time": "{{DATE}}T12:30:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "D",
+      "label": "D \u00b7 Duplicate fraud",
+      "mode": "TL",
+      "repeat": 2,
+      "sort_order": 4,
+      "description": "Same BOL and charge submitted twice: second is blocked.",
+      "request": {
+        "bol_number": "BOL-{{RUN}}",
+        "carrier_id": "CARR-7",
+        "container_or_job_id": "TRL-55",
+        "claimed_charges": [
+          {
+            "charge_code": "DET",
+            "amount": 112.5
+          }
+        ],
+        "evidence": {
+          "tl": {
+            "appointment_time": "{{DATE}}T09:00:00",
+            "arrival_time": "{{DATE}}T08:45:00",
+            "check_in_time": "{{DATE}}T08:55:00",
+            "release_time": "{{DATE}}T12:30:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "E",
+      "label": "E \u00b7 Ocean demurrage",
+      "mode": "DEM",
+      "repeat": 1,
+      "sort_order": 5,
+      "description": "3 billed days; 2 had no pickup appointment slots (documented attempts). The $500 goes to dispute review, never auto-removed.",
+      "request": {
+        "bol_number": "BOL-{{RUN}}",
+        "carrier_id": "CARR-7",
+        "container_or_job_id": "MSKU7770001",
+        "claimed_charges": [
+          {
+            "charge_code": "DEM",
+            "amount": 750
+          }
+        ],
+        "evidence": {
+          "demurrage": {
+            "discharge_date": "{{DATE-6}}",
+            "available_date": "{{DATE-6}}",
+            "last_free_day": "{{DATE-3}}",
+            "gate_out_date": "{{DATE}}",
+            "pickup_attempts": [
+              {
+                "date": "{{DATE-2}}",
+                "outcome": "NO_SLOTS_OFFERED",
+                "reference": "APPT-REQ-1"
+              },
+              {
+                "date": "{{DATE-1}}",
+                "outcome": "NO_SLOTS_OFFERED",
+                "reference": "APPT-REQ-2"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "F",
+      "label": "F \u00b7 Vessel washing",
+      "mode": "SVC",
+      "repeat": 1,
+      "sort_order": 6,
+      "description": "4 h package, 5.5 h actual: overtime billed correctly.",
+      "request": {
+        "bol_number": "BOL-{{RUN}}",
+        "carrier_id": "CARR-7",
+        "container_or_job_id": "JOB-9",
+        "claimed_charges": [
+          {
+            "charge_code": "SVC",
+            "amount": 950
+          }
+        ],
+        "evidence": {
+          "service": {
+            "job_id": "JOB-9",
+            "technician_check_in": "{{DATE}}T08:00:00",
+            "customer_otp_sign_off": "{{DATE}}T13:30:00"
+          }
+        }
+      }
+    },
+    {
+      "name": "G",
+      "label": "G \u00b7 Conflicting evidence",
+      "mode": "TL",
+      "repeat": 1,
+      "sort_order": 7,
+      "description": "GPS says 8:40, driver app says 9:05, warehouse has no check-in: show every fact, pick none, ask for the facility record.",
+      "request": {
+        "bol_number": "BOL-{{RUN}}",
+        "carrier_id": "CARR-7",
+        "container_or_job_id": "TRL-55",
+        "claimed_charges": [
+          {
+            "charge_code": "DET",
+            "amount": 300
+          }
+        ],
+        "evidence": {
+          "tl": {
+            "appointment_time": "{{DATE}}T09:00:00",
+            "arrival_time": "{{DATE}}T08:40:00",
+            "app_arrival_time": "{{DATE}}T09:05:00",
+            "check_in_time": null,
+            "release_time": "{{DATE}}T13:00:00"
+          }
+        }
+      }
+    }
+  ]
+}
