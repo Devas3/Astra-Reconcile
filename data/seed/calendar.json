@@ -1,0 +1,24 @@
+{
+  "non_working_days": [
+    {
+      "location": "PORT-LA",
+      "day": "2025-03-17",
+      "name": "Terminal closed (sample holiday)"
+    },
+    {
+      "location": "PORT-LA",
+      "day": "2025-12-25",
+      "name": "Christmas Day"
+    },
+    {
+      "location": "DC-CHI",
+      "day": "2025-12-25",
+      "name": "Christmas Day"
+    },
+    {
+      "location": "RAMP-MEM",
+      "day": "2025-07-04",
+      "name": "Independence Day"
+    }
+  ]
+}
