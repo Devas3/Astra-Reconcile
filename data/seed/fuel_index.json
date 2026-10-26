@@ -1,0 +1,9 @@
+{
+  "note": "Offline sample used only until `python -m vectura.eia_fuel_index` pulls the real EIA series.",
+  "weeks": [
+    {"week_start": "2025-03-03", "price": 3.60},
+    {"week_start": "2025-03-10", "price": 3.70},
+    {"week_start": "2025-03-17", "price": 3.80},
+    {"week_start": "2025-03-24", "price": 3.75}
+  ]
+}
