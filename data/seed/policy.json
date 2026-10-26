@@ -1,0 +1,289 @@
+{
+  "action_policies": [
+    {
+      "reason_code": "NONE",
+      "decision_owner": "Freight audit / finance (under policy)",
+      "next_action": "Approve or forward for normal posting",
+      "initial_status": "READY_TO_POST",
+      "severity": 0
+    },
+    {
+      "reason_code": "OVER_CLAIM",
+      "decision_owner": "Freight audit / commercial owner",
+      "next_action": "Accept the supported line; prepare a correction request for the remainder",
+      "initial_status": "CORRECTION_REQUESTED",
+      "severity": 2
+    },
+    {
+      "reason_code": "FUEL_PEG",
+      "decision_owner": "Freight audit / commercial owner",
+      "next_action": "Accept the DOE-pegged amount; request a corrected fuel surcharge",
+      "initial_status": "CORRECTION_REQUESTED",
+      "severity": 2
+    },
+    {
+      "reason_code": "MISSING_EVIDENCE",
+      "decision_owner": "Freight analyst / operations manager",
+      "next_action": "Request the missing records; keep the disputed value open",
+      "initial_status": "AWAITING_EVIDENCE",
+      "severity": 3
+    },
+    {
+      "reason_code": "CONFLICTING_EVIDENCE",
+      "decision_owner": "Freight analyst / operations manager",
+      "next_action": "Assess which source is reliable for the event, or obtain the facility record",
+      "initial_status": "AWAITING_EVIDENCE",
+      "severity": 3
+    },
+    {
+      "reason_code": "MISSING_CONTRACT",
+      "decision_owner": "Commercial / carrier relationship manager",
+      "next_action": "Contract review: no applicable terms on file for this charge and date",
+      "initial_status": "CONTRACT_REVIEW",
+      "severity": 4
+    },
+    {
+      "reason_code": "UNKNOWN_CHARGE",
+      "decision_owner": "Commercial / carrier relationship manager",
+      "next_action": "Contract review: charge code not recognized",
+      "initial_status": "CONTRACT_REVIEW",
+      "severity": 4
+    },
+    {
+      "reason_code": "APPOINTMENT_CONSTRAINED",
+      "decision_owner": "Commercial / carrier relationship manager",
+      "next_action": "Dispute review: documented appointment-constrained days; check contract, terminal practice and alternatives",
+      "initial_status": "DISPUTE_REVIEW",
+      "severity": 4
+    },
+    {
+      "reason_code": "DUPLICATE",
+      "decision_owner": "Commercial / carrier relationship manager",
+      "next_action": "Reject the duplicate and confirm with the carrier",
+      "initial_status": "DISPUTE_REVIEW",
+      "severity": 5
+    },
+    {
+      "reason_code": "GHOST_FEE",
+      "decision_owner": "Commercial / carrier relationship manager",
+      "next_action": "Reject unless the carrier supplies authorization or a verified receipt",
+      "initial_status": "DISPUTE_REVIEW",
+      "severity": 5
+    },
+    {
+      "reason_code": "OVERLAP",
+      "decision_owner": "Freight analyst / operations manager",
+      "next_action": "Resolve overlapping charge windows before any payment",
+      "initial_status": "DISPUTE_REVIEW",
+      "severity": 5
+    },
+    {
+      "reason_code": "PREVENT_APPROACHING",
+      "decision_owner": "Transport operations",
+      "next_action": "Free time is running out: escalate to the facility or arrange release",
+      "initial_status": "OPEN_ALERT",
+      "severity": 1
+    },
+    {
+      "reason_code": "PREVENT_EXCEEDED",
+      "decision_owner": "Transport operations",
+      "next_action": "Free time exceeded: charges are accruing; escalate and capture the cause",
+      "initial_status": "OPEN_ALERT",
+      "severity": 2
+    },
+    {
+      "reason_code": "PREVENT_NO_ARRIVAL",
+      "decision_owner": "Transport operations",
+      "next_action": "No arrival recorded past the appointment: confirm status with the carrier",
+      "initial_status": "OPEN_ALERT",
+      "severity": 1
+    },
+    {
+      "reason_code": "REFERENCE_MISMATCH",
+      "decision_owner": "Freight analyst / operations manager",
+      "next_action": "The bill's BOL, carrier or container does not match the movement on record: confirm the reference",
+      "initial_status": "AWAITING_EVIDENCE",
+      "severity": 5
+    },
+    {
+      "reason_code": "DUPLICATE_INVOICE",
+      "decision_owner": "Commercial / carrier relationship manager",
+      "next_action": "This invoice number was already processed: reject and confirm with the carrier",
+      "initial_status": "DISPUTE_REVIEW",
+      "severity": 5
+    },
+    {
+      "reason_code": "HOLD_UNVERIFIED",
+      "decision_owner": "Freight analyst / operations manager",
+      "next_action": "Obtain the terminal/customs hold record; disputed days stay open until verified",
+      "initial_status": "AWAITING_EVIDENCE",
+      "severity": 4
+    },
+    {
+      "reason_code": "EXCEPTION_REVIEW",
+      "decision_owner": "Commercial / carrier relationship manager",
+      "next_action": "A claimed exception needs a responsibility finding under the contract; operational cause alone is not a financial finding",
+      "initial_status": "DISPUTE_REVIEW",
+      "severity": 4
+    }
+  ],
+  "role_permissions": {
+    "coordinator": [
+      "view",
+      "ingest_events"
+    ],
+    "analyst": [
+      "view",
+      "ingest_events",
+      "reconcile",
+      "correct_events",
+      "approve_routine",
+      "dispute",
+      "carrier_response"
+    ],
+    "manager": [
+      "view",
+      "ingest_events",
+      "reconcile",
+      "correct_events",
+      "approve_routine",
+      "dispute",
+      "carrier_response",
+      "approve_writeoff",
+      "approve_large_writeoff",
+      "override_amount"
+    ],
+    "finance": [
+      "view",
+      "record_payment"
+    ],
+    "admin": [
+      "view",
+      "ingest_events",
+      "reconcile",
+      "correct_events",
+      "approve_routine",
+      "dispute",
+      "carrier_response",
+      "approve_writeoff",
+      "approve_large_writeoff",
+      "override_amount",
+      "record_payment",
+      "admin"
+    ]
+  },
+  "decision_types": [
+    {
+      "code": "ACCEPT",
+      "permission": "approve_routine",
+      "resulting_status": "READY_TO_POST",
+      "requires_reason": false,
+      "allowed_from": [
+        "READY_TO_POST",
+        "CORRECTION_REQUESTED",
+        "DISPUTE_REVIEW",
+        "AWAITING_EVIDENCE",
+        "CONTRACT_REVIEW",
+        "CARRIER_RESPONDED"
+      ],
+      "needs_amount": false,
+      "needs_reference": false
+    },
+    {
+      "code": "DISPUTE",
+      "permission": "dispute",
+      "resulting_status": "DISPUTED",
+      "requires_reason": true,
+      "allowed_from": [
+        "CORRECTION_REQUESTED",
+        "DISPUTE_REVIEW",
+        "AWAITING_EVIDENCE",
+        "CONTRACT_REVIEW",
+        "CARRIER_RESPONDED"
+      ],
+      "needs_amount": false,
+      "needs_reference": false
+    },
+    {
+      "code": "CARRIER_RESPONSE",
+      "permission": "carrier_response",
+      "resulting_status": "CARRIER_RESPONDED",
+      "requires_reason": true,
+      "allowed_from": [
+        "DISPUTED",
+        "CORRECTION_REQUESTED"
+      ],
+      "needs_amount": false,
+      "needs_reference": false
+    },
+    {
+      "code": "WRITE_OFF",
+      "permission": "approve_writeoff",
+      "resulting_status": "WRITTEN_OFF",
+      "requires_reason": true,
+      "allowed_from": [
+        "DISPUTED",
+        "CARRIER_RESPONDED",
+        "DISPUTE_REVIEW"
+      ],
+      "needs_amount": true,
+      "needs_reference": false
+    },
+    {
+      "code": "OVERRIDE_AMOUNT",
+      "permission": "override_amount",
+      "resulting_status": "READY_TO_POST",
+      "requires_reason": true,
+      "allowed_from": [],
+      "needs_amount": true,
+      "needs_reference": false
+    },
+    {
+      "code": "MARK_PAID",
+      "permission": "record_payment",
+      "resulting_status": "PAID",
+      "requires_reason": false,
+      "allowed_from": [
+        "READY_TO_POST",
+        "AGREED"
+      ],
+      "needs_amount": true,
+      "needs_reference": true
+    },
+    {
+      "code": "AGREE_SETTLEMENT",
+      "permission": "carrier_response",
+      "resulting_status": "AGREED",
+      "requires_reason": true,
+      "allowed_from": [
+        "DISPUTED",
+        "CARRIER_RESPONDED",
+        "CORRECTION_REQUESTED"
+      ],
+      "needs_amount": true,
+      "needs_reference": false
+    }
+  ],
+  "status_outcomes": [
+    {
+      "status": "READY_TO_POST",
+      "kind": "SETTLEMENT_READY"
+    },
+    {
+      "status": "CORRECTION_REQUESTED",
+      "kind": "CORRECTION_REQUESTED"
+    },
+    {
+      "status": "DISPUTED",
+      "kind": "DISPUTE_RAISED"
+    },
+    {
+      "status": "PAID",
+      "kind": "PAYMENT_RECORDED"
+    },
+    {
+      "status": "AGREED",
+      "kind": "SETTLEMENT_READY"
+    }
+  ]
+}
