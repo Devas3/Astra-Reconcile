@@ -1,0 +1,23 @@
+# secrets and local config
+.env
+
+# virtual environments and caches
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# local databases and uploaded files
+*.db
+*.db-*
+var/
+
+# editor / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
