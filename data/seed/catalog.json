@@ -1,0 +1,109 @@
+{
+  "charges": [
+    {
+      "code": "LH",
+      "description": "Linehaul freight",
+      "requires_authorization": false
+    },
+    {
+      "code": "FSC",
+      "description": "Fuel surcharge",
+      "requires_authorization": false
+    },
+    {
+      "code": "DET",
+      "description": "Truckload detention",
+      "requires_authorization": true
+    },
+    {
+      "code": "DEM",
+      "description": "Ocean container demurrage",
+      "requires_authorization": false
+    },
+    {
+      "code": "OCN_DET",
+      "description": "Ocean equipment detention",
+      "requires_authorization": false
+    },
+    {
+      "code": "STOR",
+      "description": "Terminal/port/air storage",
+      "requires_authorization": false
+    },
+    {
+      "code": "SVC",
+      "description": "Facility service (vessel washing)",
+      "requires_authorization": false
+    },
+    {
+      "code": "LFT",
+      "description": "Liftgate",
+      "requires_authorization": true
+    },
+    {
+      "code": "LMP",
+      "description": "Lumper",
+      "requires_authorization": true
+    },
+    {
+      "code": "BROOM",
+      "description": "Broom clean",
+      "requires_authorization": true
+    },
+    {
+      "code": "INS",
+      "description": "Insurance",
+      "requires_authorization": true
+    },
+    {
+      "code": "LAYOVER",
+      "description": "Overnight layover",
+      "requires_authorization": true
+    },
+    {
+      "code": "TONU",
+      "description": "Truck ordered not used",
+      "requires_authorization": true
+    },
+    {
+      "code": "RAIL_DEM",
+      "description": "Railcar demurrage",
+      "requires_authorization": false
+    },
+    {
+      "code": "LTL_REDEL",
+      "description": "LTL redelivery",
+      "requires_authorization": true
+    },
+    {
+      "code": "LTL_STOR",
+      "description": "LTL terminal storage",
+      "requires_authorization": true
+    },
+    {
+      "code": "LTL_RECON",
+      "description": "LTL reconsignment",
+      "requires_authorization": true
+    },
+    {
+      "code": "IM_STOR",
+      "description": "Intermodal ramp storage",
+      "requires_authorization": false
+    },
+    {
+      "code": "IM_DET",
+      "description": "Intermodal equipment detention",
+      "requires_authorization": false
+    }
+  ],
+  "conflicts": [
+    [
+      "DET",
+      "LAYOVER"
+    ],
+    [
+      "DET",
+      "TONU"
+    ]
+  ]
+}
