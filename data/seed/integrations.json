@@ -1,0 +1,120 @@
+{
+  "sources": [
+    {
+      "name": "tms",
+      "description": "Transportation management system status events",
+      "auth_env": "VECTURA_SRC_TMS_SECRET",
+      "mapping": {
+        "movement_field": "shipmentId",
+        "carrier_field": "carrierCode",
+        "bol_field": "bol",
+        "ref_field": "equipmentId",
+        "location_field": "stopCode",
+        "events_field": "statuses",
+        "type_field": "code",
+        "time_field": "at",
+        "tz_field": "tz",
+        "types": {
+          "APPT_CONFIRMED": [
+            "APPOINTMENT",
+            "TMS"
+          ],
+          "DEPARTED_STOP": [
+            "RELEASE",
+            "GATE"
+          ]
+        }
+      }
+    },
+    {
+      "name": "wms",
+      "description": "Warehouse / yard / gate events",
+      "auth_env": "VECTURA_SRC_WMS_SECRET",
+      "mapping": {
+        "movement_field": "movement",
+        "carrier_field": "carrier",
+        "bol_field": "bol",
+        "ref_field": "trailer",
+        "location_field": "facility",
+        "events_field": "events",
+        "type_field": "event",
+        "time_field": "ts",
+        "tz_field": "tz",
+        "types": {
+          "CHECKED_IN": [
+            "CHECK_IN",
+            "WMS"
+          ],
+          "DOCK_START": [
+            "DOCK_START",
+            "WMS"
+          ],
+          "GATE_IN": [
+            "ARRIVAL",
+            "GATE"
+          ],
+          "GATE_OUT": [
+            "RELEASE",
+            "GATE"
+          ]
+        }
+      }
+    },
+    {
+      "name": "telematics",
+      "description": "GPS geofence events",
+      "auth_env": "VECTURA_SRC_GPS_SECRET",
+      "mapping": {
+        "movement_field": "tripId",
+        "carrier_field": "carrier",
+        "bol_field": "bol",
+        "ref_field": "trailer",
+        "location_field": "geofence",
+        "events_field": "crossings",
+        "type_field": "type",
+        "time_field": "time",
+        "tz_field": "tz",
+        "types": {
+          "ENTER": [
+            "ARRIVAL",
+            "GPS"
+          ]
+        }
+      }
+    }
+  ],
+  "targets": [
+    {
+      "name": "finance_erp",
+      "description": "AP / ERP posting of approved amounts",
+      "url": "http://localhost:9000/erp/post",
+      "subscribes": [
+        "SETTLEMENT_READY",
+        "PAYMENT_RECORDED"
+      ],
+      "auth_env": "VECTURA_TGT_ERP_TOKEN",
+      "enabled": false
+    },
+    {
+      "name": "carrier_workflow",
+      "description": "Dispute pack to the carrier communication process",
+      "url": "http://localhost:9000/carrier/dispute",
+      "subscribes": [
+        "DISPUTE_RAISED",
+        "CORRECTION_REQUESTED"
+      ],
+      "auth_env": "VECTURA_TGT_CARRIER_TOKEN",
+      "enabled": false
+    },
+    {
+      "name": "tms_alerts",
+      "description": "Prevention alerts back to the TMS / operations",
+      "url": "http://localhost:9000/tms/alerts",
+      "subscribes": [
+        "PREVENTION_ALERT"
+      ],
+      "auth_env": "VECTURA_TGT_TMS_TOKEN",
+      "enabled": false
+    }
+  ]
+}
