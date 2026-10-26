@@ -1,0 +1,28 @@
+{
+  "event_types": [
+    {"code": "APPOINTMENT", "description": "Confirmed appointment", "evidence_group": "tl", "evidence_field": "appointment_time", "closes_clock": false},
+    {"code": "ARRIVAL", "description": "Arrival at facility (GPS/gate)", "evidence_group": "tl", "evidence_field": "arrival_time", "closes_clock": false},
+    {"code": "ARRIVAL_APP", "description": "Arrival reported by driver app", "evidence_group": "tl", "evidence_field": "app_arrival_time", "closes_clock": false},
+    {"code": "CHECK_IN", "description": "Facility check-in completed", "evidence_group": "tl", "evidence_field": "check_in_time", "closes_clock": false},
+    {"code": "DOCK_START", "description": "Dock start", "evidence_group": "tl", "evidence_field": "dock_start_time", "closes_clock": false},
+    {"code": "RELEASE", "description": "Driver released / gate-out", "evidence_group": "tl", "evidence_field": "release_time", "closes_clock": true},
+    {"code": "TECH_CHECK_IN", "description": "Technician on-site check-in", "evidence_group": "service", "evidence_field": "technician_check_in", "closes_clock": false},
+    {"code": "OTP_SIGN_OFF", "description": "Customer OTP / supervisor sign-off", "evidence_group": "service", "evidence_field": "customer_otp_sign_off", "closes_clock": true}
+  ],
+  "source_reliability": [
+    {"event_type": "APPOINTMENT", "source": "SCHEDULER", "rank": 1},
+    {"event_type": "APPOINTMENT", "source": "TMS", "rank": 2},
+    {"event_type": "ARRIVAL", "source": "GATE", "rank": 1},
+    {"event_type": "ARRIVAL", "source": "GPS", "rank": 2},
+    {"event_type": "ARRIVAL_APP", "source": "DRIVER_APP", "rank": 1},
+    {"event_type": "CHECK_IN", "source": "WMS", "rank": 1},
+    {"event_type": "CHECK_IN", "source": "YARD", "rank": 2},
+    {"event_type": "DOCK_START", "source": "WMS", "rank": 1},
+    {"event_type": "RELEASE", "source": "GATE", "rank": 1},
+    {"event_type": "RELEASE", "source": "WMS", "rank": 2},
+    {"event_type": "TECH_CHECK_IN", "source": "GEOFENCE", "rank": 1},
+    {"event_type": "TECH_CHECK_IN", "source": "APP", "rank": 2},
+    {"event_type": "OTP_SIGN_OFF", "source": "CUSTOMER_OTP", "rank": 1},
+    {"event_type": "OTP_SIGN_OFF", "source": "SUPERVISOR", "rank": 2}
+  ]
+}
