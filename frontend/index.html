@@ -6,7 +6,8 @@
 <title>Vectura Reconcile</title>
 <script>
 /* apply the saved theme before first paint to avoid a flash */
-(function(){var t=null;try{t=localStorage.getItem('vt')}catch(e){}
+(function(){var t=null;try{t=new URLSearchParams(location.search).get('theme')}catch(e){}
+if(t!=='dark'&&t!=='light'){t=null;try{t=localStorage.getItem('vt')}catch(e){}}
 if(!t)t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
 document.documentElement.setAttribute('data-theme',t)})();
 </script>
